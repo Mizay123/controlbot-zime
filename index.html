@@ -608,4 +608,207 @@
         }
     });
 
-   
+       async function sendBroadcast() {
+        const bot = BOTS.find(b => b.id === currentBotId);
+        if (!bot || !bot.token) {
+            addLog("Token bot belum disimpan.", "error");
+            return;
+        }
+        
+        if (currentUsers.length === 0) {
+            addLog("Tidak ada user. Sinkronisasi dulu.", "error");
+            return;
+        }
+        
+        const message = document.getElementById('broadcastMessage').value;
+        const imageUrl = document.getElementById('imageUrl').value;
+        
+        if (!message.trim() && !imageUrl) {
+            addLog("Pesan atau gambar harus diisi.", "error");
+            return;
+        }
+        
+        addLog(`Broadcast ke ${currentUsers.length} user...`, "info");
+        let success = 0, failed = 0;
+        
+        for (let user of currentUsers) {
+            let result;
+            if (imageUrl) {
+                result = await callTelegram('sendPhoto', bot.token, {
+                    chat_id: user.id,
+                    photo: imageUrl,
+                    caption: message,
+                    parse_mode: 'HTML'
+                });
+            } else {
+                result = await callTelegram('sendMessage', bot.token, {
+                    chat_id: user.id,
+                    text: message,
+                    parse_mode: 'HTML'
+                });
+            }
+            if (result && result.ok) success++;
+            else failed++;
+            await new Promise(r => setTimeout(r, 50));
+        }
+        
+        addLog(`Broadcast selesai. Berhasil: ${success}, Gagal: ${failed}`, success > 0 ? "success" : "error");
+    }
+
+    function addSchedule() {
+        const scheduleTime = document.getElementById('scheduleTime').value;
+        const message = document.getElementById('scheduleMessage').value;
+        
+        if (!scheduleTime || !message.trim()) {
+            addLog("Isi waktu dan pesan untuk jadwal.", "error");
+            return;
+        }
+        
+        const schedule = {
+            id: Date.now(),
+            botId: currentBotId,
+            botName: getCurrentBotName(),
+            time: scheduleTime,
+            message: message,
+            executed: false
+        };
+        
+        schedules.push(schedule);
+        localStorage.setItem('all_schedules', JSON.stringify(schedules));
+        addLog(`Jadwal ditambahkan: ${scheduleTime}`, "success");
+        displaySchedules();
+    }
+    
+    function displaySchedules() {
+        const container = document.getElementById('scheduleList');
+        const activeSchedules = schedules.filter(s => !s.executed);
+        
+        if (activeSchedules.length === 0) {
+            container.innerHTML = '<div style="color: #8892b0; text-align: center;">Tidak ada jadwal aktif</div>';
+            return;
+        }
+        
+        let html = '';
+        activeSchedules.forEach(s => {
+            html += `
+                <div class="schedule-item">
+                    <strong>${s.botName}</strong><br>
+                    Waktu: ${s.time}<br>
+                    Pesan: ${s.message.substring(0, 50)}${s.message.length > 50 ? '...' : ''}<br>
+                    <button onclick="deleteSchedule(${s.id})" style="margin-top: 8px; padding: 4px 12px; width: auto;">Hapus</button>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+    
+    window.deleteSchedule = function(id) {
+        schedules = schedules.filter(s => s.id !== id);
+        localStorage.setItem('all_schedules', JSON.stringify(schedules));
+        displaySchedules();
+        addLog("Jadwal dihapus", "info");
+    };
+    
+    function startScheduleChecker() {
+        setInterval(async () => {
+            const now = new Date();
+            for (let schedule of schedules) {
+                if (!schedule.executed) {
+                    const scheduleDate = new Date(schedule.time);
+                    if (scheduleDate <= now) {
+                        schedule.executed = true;
+                        localStorage.setItem('all_schedules', JSON.stringify(schedules));
+                        
+                        const bot = BOTS.find(b => b.name === schedule.botName);
+                        if (bot && bot.token) {
+                            const savedUsers = localStorage.getItem(`bot_users_${bot.name}`);
+                            if (savedUsers) {
+                                const users = JSON.parse(savedUsers);
+                                addLog(`Menjalankan jadwal untuk ${schedule.botName} ke ${users.length} user`, "info");
+                                for (let user of users) {
+                                    await callTelegram('sendMessage', bot.token, {
+                                        chat_id: user.id,
+                                        text: schedule.message,
+                                        parse_mode: 'HTML'
+                                    });
+                                    await new Promise(r => setTimeout(r, 50));
+                                }
+                                addLog(`Jadwal ${schedule.id} selesai`, "success");
+                            }
+                        }
+                        displaySchedules();
+                    }
+                }
+            }
+        }, 30000);
+    }
+
+    function addLog(msg, type = "info") {
+        const logDiv = document.getElementById('logArea');
+        const time = new Date().toLocaleTimeString();
+        const prefix = type === "error" ? "ERROR" : type === "success" ? "OK" : "INFO";
+        const color = type === "error" ? "#ff8888" : type === "success" ? "#88ff88" : "#aaffff";
+        logDiv.innerHTML += `<div style="color: ${color}">[${time}] [${prefix}] ${msg}</div>`;
+        logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    // Event Listeners
+    document.getElementById('saveTokenBtn').onclick = () => {
+        const newToken = document.getElementById('manualToken').value.trim();
+        if (newToken) {
+            saveCurrentBotToken(newToken);
+            addLog("Token disimpan.", "success");
+        } else {
+            addLog("Token tidak boleh kosong.", "error");
+        }
+    };
+    
+    document.getElementById('syncUsersBtn').onclick = syncUsers;
+    document.getElementById('exportCsvBtn').onclick = exportToCSV;
+    document.getElementById('sendBroadcastBtn').onclick = sendBroadcast;
+    document.getElementById('addScheduleBtn').onclick = addSchedule;
+    document.getElementById('viewSchedulesBtn').onclick = displaySchedules;
+    document.getElementById('showSinglePanelBtn').onclick = () => {
+        const panel = document.getElementById('singleUserPanel');
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    };
+    document.getElementById('clearDataBtn').onclick = () => {
+        const botName = getCurrentBotName();
+        if (botName && confirm(`Reset semua data untuk ${botName}?`)) {
+            localStorage.removeItem(`bot_users_${botName}`);
+            localStorage.removeItem(`bot_token_${botName}`);
+            currentUsers = [];
+            const bot = BOTS.find(b => b.id === currentBotId);
+            if (bot) bot.token = null;
+            document.getElementById('manualToken').value = '';
+            renderBotList();
+            updateUserDisplay();
+            addLog(`Data bot ${botName} telah direset.`, "info");
+        }
+    };
+    document.getElementById('executeSingleBtn').onclick = async () => {
+        const userId = document.getElementById('targetUserId').value.trim();
+        const msg = document.getElementById('singleMessage').value.trim();
+        if (!userId || !msg) {
+            addLog("User ID dan pesan harus diisi.", "error");
+            return;
+        }
+        const bot = BOTS.find(b => b.id === currentBotId);
+        if (!bot || !bot.token) {
+            addLog("Token bot belum disimpan.", "error");
+            return;
+        }
+        const result = await callTelegram('sendMessage', bot.token, {
+            chat_id: userId,
+            text: msg,
+            parse_mode: 'HTML'
+        });
+        if (result && result.ok) addLog(`Pesan terkirim ke user ${userId}`, "success");
+        else addLog(`Gagal kirim ke ${userId}`, "error");
+    };
+    
+    // Inisialisasi
+    loadStorage();
+</script>
+</body>
+</html>
