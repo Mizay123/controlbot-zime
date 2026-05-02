@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>ZIME BOT CONTROL - Scroll Mode</title>
+    <title>ZIME BOT CONTROL - Ultimate Command Center</title>
     <style>
         * {
             margin: 0;
@@ -18,7 +18,6 @@
             padding: 20px;
         }
 
-        /* Single column container - SCROLL MODE */
         .scroll-container {
             max-width: 900px;
             margin: 0 auto;
@@ -51,7 +50,6 @@
             font-size: 14px;
         }
 
-        /* Card Style - Vertikal */
         .card {
             background: rgba(0, 0, 0, 0.6);
             border-radius: 24px;
@@ -76,7 +74,6 @@
             letter-spacing: 1px;
         }
 
-        /* Bot Grid */
         .bot-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -245,11 +242,6 @@
             color: #8892b0;
         }
 
-        hr {
-            border-color: rgba(255, 255, 255, 0.05);
-            margin: 20px 0;
-        }
-
         .schedule-item {
             background: rgba(20, 20, 40, 0.6);
             padding: 10px;
@@ -273,7 +265,6 @@
             display: none;
         }
 
-        /* Scroll indicator */
         .scroll-hint {
             text-align: center;
             padding: 15px;
@@ -284,8 +275,13 @@
         }
 
         .scroll-hint::before {
-            content: "Zime majesty";
+            content: "⬇️  SCROLL DOWN FOR MORE FEATURES  ⬇️";
             letter-spacing: 2px;
+        }
+
+        .auto-response-card {
+            background: rgba(30, 40, 60, 0.4);
+            border-left: 3px solid #64ffda;
         }
     </style>
 </head>
@@ -303,13 +299,32 @@
         <div class="bot-grid" id="botListContainer"></div>
         
         <div class="input-group" style="margin-top: 20px;">
-            <label>BOT TOKEN (Manual Input)</label>
-            <input type="password" id="manualToken" placeholder="Masukkan token bot dari @BotFather">
-            <button id="saveTokenBtn" style="margin-top: 10px;">Simpan Token untuk Bot Ini</button>
+            <label>BOT TOKEN (from @BotFather)</label>
+            <input type="password" id="manualToken" placeholder="Enter your bot token">
+            <button id="saveTokenBtn" style="margin-top: 10px;">Save Token for This Bot</button>
         </div>
     </div>
 
-    <!-- CARD 2: USER DATABASE -->
+    <!-- CARD 2: AUTO RESPONSE SETTINGS (NEW) -->
+    <div class="card auto-response-card">
+        <div class="card-title">🤖 AUTO RESPONSE FOR /start</div>
+        <div class="input-group">
+            <label>Welcome Message (English)</label>
+            <textarea id="welcomeMessage" rows="3">Hello! Welcome to ZimeMajesty Bot.</textarea>
+        </div>
+        <div class="input-group">
+            <label>Button Text</label>
+            <input type="text" id="buttonText" value="Visit Our Shop">
+        </div>
+        <div class="input-group">
+            <label>Button URL</label>
+            <input type="text" id="buttonUrl" value="https://t.me/+nID0U-gMoQ02OGJl">
+        </div>
+        <button id="saveAutoResponseBtn">Save Auto Response Settings</button>
+        <button id="testAutoResponseBtn" class="secondary" style="margin-top: 10px;">Test Send to Yourself</button>
+    </div>
+
+    <!-- CARD 3: USER DATABASE -->
     <div class="card">
         <div class="card-title">USER DATABASE</div>
         <div id="userStats" class="stats">
@@ -323,65 +338,65 @@
             </div>
         </div>
         <div class="flex-row">
-            <button id="syncUsersBtn">Sinkronisasi User</button>
-            <button id="exportCsvBtn" class="success">Export ke CSV</button>
+            <button id="syncUsersBtn">Sync Users (/start)</button>
+            <button id="exportCsvBtn" class="success">Export to CSV</button>
         </div>
         <div id="userListArea" class="user-list-area" style="margin-top: 15px;">
-            <div style="color: #8892b0; text-align: center;">Belum ada data, klik sinkronisasi</div>
+            <div style="color: #8892b0; text-align: center;">No data yet, click sync</div>
         </div>
     </div>
 
-    <!-- CARD 3: BROADCAST MESSAGE -->
+    <!-- CARD 4: BROADCAST MESSAGE -->
     <div class="card">
         <div class="card-title">BROADCAST MESSAGE</div>
         <div class="input-group">
-            <label>Pesan ke Semua User (Support HTML)</label>
-            <textarea id="broadcastMessage" rows="3" placeholder="Tulis pesan broadcast di sini..."></textarea>
+            <label>Message to All Users (HTML supported)</label>
+            <textarea id="broadcastMessage" rows="3" placeholder="Write your broadcast message here..."></textarea>
         </div>
         <div class="input-group">
-            <label>Kirim Gambar (URL atau File)</label>
+            <label>Send Image (URL or Upload)</label>
             <input type="text" id="imageUrl" placeholder="https://example.com/image.jpg">
             <input type="file" id="imageFile" accept="image/*" style="margin-top: 8px;">
             <img id="imagePreview" class="image-preview" alt="Preview">
         </div>
-        <button id="sendBroadcastBtn">Kirim ke Seluruh User</button>
+        <button id="sendBroadcastBtn">Send to All Users</button>
     </div>
 
-    <!-- CARD 4: SCHEDULED BROADCAST -->
+    <!-- CARD 5: SCHEDULED BROADCAST -->
     <div class="card">
         <div class="card-title">SCHEDULED BROADCAST</div>
         <div class="input-group">
-            <label>Tanggal & Waktu</label>
+            <label>Date & Time</label>
             <input type="datetime-local" id="scheduleTime">
         </div>
         <div class="input-group">
-            <label>Pesan Terjadwal</label>
-            <textarea id="scheduleMessage" rows="2" placeholder="Pesan untuk dikirim otomatis..."></textarea>
+            <label>Scheduled Message</label>
+            <textarea id="scheduleMessage" rows="2" placeholder="Message to be sent automatically..."></textarea>
         </div>
         <div class="flex-row">
-            <button id="addScheduleBtn">Tambah Jadwal</button>
-            <button id="viewSchedulesBtn" class="secondary">Lihat Jadwal</button>
+            <button id="addScheduleBtn">Add Schedule</button>
+            <button id="viewSchedulesBtn" class="secondary">View Schedules</button>
         </div>
         <div id="scheduleList" style="margin-top: 15px; max-height: 200px; overflow-y: auto;"></div>
     </div>
 
-    <!-- CARD 5: SINGLE USER MESSAGE -->
+    <!-- CARD 6: SINGLE USER MESSAGE -->
     <div class="card">
-        <div class="card-title">KIRIM KE USER TERTENTU</div>
+        <div class="card-title">SEND TO SPECIFIC USER</div>
         <div id="singleUserPanel" class="single-user-panel">
             <input type="text" id="targetUserId" placeholder="User ID" style="margin-bottom: 8px;">
-            <textarea id="singleMessage" rows="2" placeholder="Pesan spesifik..."></textarea>
-            <button id="executeSingleBtn" style="margin-top: 8px;">Kirim Sekarang</button>
+            <textarea id="singleMessage" rows="2" placeholder="Specific message..."></textarea>
+            <button id="executeSingleBtn" style="margin-top: 8px;">Send Now</button>
         </div>
-        <button id="showSinglePanelBtn" class="secondary">Tampilkan Panel User Spesifik</button>
-        <button id="clearDataBtn" class="danger" style="margin-top: 10px;">Reset Data Bot Ini</button>
+        <button id="showSinglePanelBtn" class="secondary">Show Single User Panel</button>
+        <button id="clearDataBtn" class="danger" style="margin-top: 10px;">Reset This Bot Data</button>
     </div>
 
-    <!-- CARD 6: ACTIVITY LOG -->
+    <!-- CARD 7: ACTIVITY LOG -->
     <div class="card">
         <div class="card-title">ACTIVITY LOG</div>
         <div id="logArea" class="log-area">
-            [System] ZIME Bot Control siap digunakan
+            [System] ZIME Bot Control Ready
         </div>
     </div>
 
@@ -391,21 +406,28 @@
 <script>
     // ======================= DATA BOT (10 Username) =======================
     const BOTS = [
-        { id: 1, name: "bot1", token: null },
-        { id: 2, name: "bot2", token: null },
-        { id: 3, name: "bot3", token: null },
-        { id: 4, name: "bot4", token: null },
-        { id: 5, name: "bot5", token: null },
-        { id: 6, name: "bot6", token: null },
-        { id: 7, name: "bot7", token: null },
-        { id: 8, name: "bot8", token: null },
-        { id: 9, name: "bot9", token: null },
-        { id: 10, name: "bot10", token: null }
+        { id: 1, name: "AlphaGuardBot", token: null },
+        { id: 2, name: "NeuralScanBot", token: null },
+        { id: 3, name: "PhantomXBot", token: null },
+        { id: 4, name: "AegisCoreBot", token: null },
+        { id: 5, name: "QuantumLinkBot", token: null },
+        { id: 6, name: "StealthModeBot", token: null },
+        { id: 7, name: "EchoCommandBot", token: null },
+        { id: 8, name: "FrostByteBot", token: null },
+        { id: 9, name: "RavenNetBot", token: null },
+        { id: 10, name: "VortexCtrlBot", token: null }
     ];
 
     let currentBotId = null;
     let currentUsers = [];
     let schedules = [];
+
+    // Default auto response settings
+    let autoResponse = {
+        message: "Hello! Welcome to ZimeMajesty Bot.\n\nPlease visit our shop:",
+        buttonText: "Visit Our Shop",
+        buttonUrl: "https://t.me/+nID0U-gMoQ02OGJl"
+    };
 
     function loadStorage() {
         for (let bot of BOTS) {
@@ -425,9 +447,19 @@
         const savedSchedules = localStorage.getItem('all_schedules');
         if (savedSchedules) schedules = JSON.parse(savedSchedules);
         
+        // Load auto response settings
+        const savedAutoResponse = localStorage.getItem('auto_response_settings');
+        if (savedAutoResponse) autoResponse = JSON.parse(savedAutoResponse);
+        
+        // Populate auto response form
+        document.getElementById('welcomeMessage').value = autoResponse.message;
+        document.getElementById('buttonText').value = autoResponse.buttonText;
+        document.getElementById('buttonUrl').value = autoResponse.buttonUrl;
+        
         renderBotList();
         updateUserDisplay();
         startScheduleChecker();
+        startWebhookChecker();
     }
 
     function getCurrentBotName() {
@@ -440,7 +472,9 @@
         if (bot) {
             bot.token = token;
             localStorage.setItem(`bot_token_${bot.name}`, token);
-            addLog(`Token untuk ${bot.name} telah disimpan`, "info");
+            addLog(`Token for ${bot.name} saved`, "success");
+            // After saving token, setup webhook for auto response
+            setupAutoResponseWebhook(token);
         }
     }
 
@@ -461,7 +495,7 @@
         
         const container = document.getElementById('userListArea');
         if (total === 0) {
-            container.innerHTML = '<div style="color: #8892b0; text-align: center;">Belum ada data, klik sinkronisasi</div>';
+            container.innerHTML = '<div style="color: #8892b0; text-align: center;">No data yet, click sync</div>';
             return;
         }
         
@@ -475,7 +509,7 @@
     window.fillUserId = function(userId) {
         document.getElementById('targetUserId').value = userId;
         document.getElementById('singleUserPanel').style.display = 'block';
-        addLog(`User ID ${userId} siap dikirimi pesan`, "info");
+        addLog(`User ID ${userId} ready for message`, "info");
     };
 
     function renderBotList() {
@@ -486,7 +520,7 @@
             div.className = `bot-item ${currentBotId === bot.id ? 'selected' : ''}`;
             div.innerHTML = `
                 <div class="bot-name">${bot.name}</div>
-                <div class="bot-status">${bot.token ? 'Token tersimpan' : 'Token belum diisi'}</div>
+                <div class="bot-status">${bot.token ? 'Token saved' : 'No token'}</div>
             `;
             div.onclick = () => switchBot(bot.id);
             container.appendChild(div);
@@ -513,7 +547,12 @@
         
         renderBotList();
         updateUserDisplay();
-        addLog(`Beralih ke bot: ${botName}`, "info");
+        addLog(`Switched to bot: ${botName}`, "info");
+        
+        // Setup webhook for new bot if token exists
+        if (bot && bot.token) {
+            setupAutoResponseWebhook(bot.token);
+        }
     }
 
     async function callTelegram(method, token, params = {}) {
@@ -531,18 +570,115 @@
         }
     }
 
-    async function syncUsers() {
+    // ======================= AUTO RESPONSE WEBHOOK SETUP =======================
+    async function setupAutoResponseWebhook(token) {
+        if (!token) return;
+        
+        // First, delete old webhook
+        await callTelegram('deleteWebhook', token, { drop_pending_updates: true });
+        
+        // We'll use getUpdates polling instead of webhook (works without public URL)
+        addLog(`Auto response mode: polling active for /start`, "info");
+    }
+
+    // Polling for /start commands (alternative to webhook)
+    let lastUpdateId = 0;
+    async function checkForStartCommands() {
+        const bot = BOTS.find(b => b.id === currentBotId);
+        if (!bot || !bot.token) return;
+        
+        const result = await callTelegram('getUpdates', bot.token, { 
+            offset: lastUpdateId + 1,
+            timeout: 5,
+            allowed_updates: ['message']
+        });
+        
+        if (result && result.ok && result.result) {
+            for (const update of result.result) {
+                lastUpdateId = update.update_id;
+                const msg = update.message;
+                if (msg && msg.text === '/start' && msg.from) {
+                             const chatId = msg.from.id;
+                    await sendWelcomeMessage(bot.token, chatId);
+                    addLog(`Auto response sent to ${msg.from.first_name} (${chatId})`, "success");
+                }
+            }
+        }
+    }
+
+    async function sendWelcomeMessage(token, chatId) {
+        const message = autoResponse.message;
+        const buttonText = autoResponse.buttonText;
+        const buttonUrl = autoResponse.buttonUrl;
+        
+        const inlineKeyboard = {
+            inline_keyboard: [
+                [{ text: buttonText, url: buttonUrl }]
+            ]
+        };
+        
+        const result = await callTelegram('sendMessage', token, {
+            chat_id: chatId,
+            text: message,
+            reply_markup: JSON.stringify(inlineKeyboard),
+            parse_mode: 'HTML'
+        });
+        
+        return result && result.ok;
+    }
+
+    async function testAutoResponse() {
         const bot = BOTS.find(b => b.id === currentBotId);
         if (!bot || !bot.token) {
-            addLog(`Token untuk ${bot.name} belum diisi. Simpan token dulu.`, "error");
+            addLog("Save bot token first", "error");
             return;
         }
         
-        addLog(`Memulai sinkronisasi user untuk ${bot.name}...`, "info");
+        // Find current user's chat ID (first in list)
+        if (currentUsers.length === 0) {
+            addLog("No users found. Sync users first, then test.", "error");
+            return;
+        }
+        
+        const testUser = currentUsers[0];
+        const success = await sendWelcomeMessage(bot.token, testUser.id);
+        if (success) {
+            addLog(`Test auto response sent to ${testUser.name}`, "success");
+        } else {
+            addLog(`Failed to send test message`, "error");
+        }
+    }
+
+    function saveAutoResponseSettings() {
+        autoResponse = {
+            message: document.getElementById('welcomeMessage').value,
+            buttonText: document.getElementById('buttonText').value,
+            buttonUrl: document.getElementById('buttonUrl').value
+        };
+        localStorage.setItem('auto_response_settings', JSON.stringify(autoResponse));
+        addLog("Auto response settings saved", "success");
+    }
+
+    // ======================= START POLLING =======================
+    function startWebhookChecker() {
+        setInterval(() => {
+            checkForStartCommands();
+        }, 2000); // Check every 2 seconds
+    }
+
+    // ======================= SYNC USERS =======================
+    async function syncUsers() {
+        const bot = BOTS.find(b => b.id === currentBotId);
+        if (!bot || !bot.token) {
+            addLog(`Token for ${bot.name} not saved yet.`, "error");
+            return;
+        }
+        
+        addLog(`Syncing users for ${bot.name}...`, "info");
         const result = await callTelegram('getUpdates', bot.token, { timeout: 1, allowed_updates: ['message'] });
         
         if (!result || !result.ok) {
-            addLog(`Gagal sync: ${result?.description || 'Token invalid'}`, "error");
+            addLog(`Sync failed: ${result?.description || 'Invalid token'}`, "error");
             return;
         }
         
@@ -567,16 +703,16 @@
         const now = new Date().toLocaleString();
         localStorage.setItem(`last_sync_${bot.name}`, now);
         document.getElementById('lastSync').innerText = now;
-        addLog(`Sync selesai. Ditemukan ${users.length} user.`, "success");
+        addLog(`Sync complete. Found ${users.length} users who used /start.`, "success");
     }
 
     function exportToCSV() {
         if (currentUsers.length === 0) {
-            addLog("Tidak ada data user untuk diexport.", "error");
+            addLog("No user data to export.", "error");
             return;
         }
         
-        let csvContent = "User ID,Nama,Username\n";
+        let csvContent = "User ID,Name,Username\n";
         currentUsers.forEach(user => {
             csvContent += `${user.id},${user.name},${user.username}\n`;
         });
@@ -590,9 +726,10 @@
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-        addLog(`Export CSV berhasil: ${currentUsers.length} user`, "success");
+        addLog(`CSV exported: ${currentUsers.length} users`, "success");
     }
 
+    // Image handling
     document.getElementById('imageFile').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -608,15 +745,16 @@
         }
     });
 
-       async function sendBroadcast() {
+    // ======================= BROADCAST =======================
+    async function sendBroadcast() {
         const bot = BOTS.find(b => b.id === currentBotId);
         if (!bot || !bot.token) {
-            addLog("Token bot belum disimpan.", "error");
+            addLog("Bot token not saved.", "error");
             return;
         }
         
         if (currentUsers.length === 0) {
-            addLog("Tidak ada user. Sinkronisasi dulu.", "error");
+            addLog("No users. Sync first.", "error");
             return;
         }
         
@@ -624,11 +762,11 @@
         const imageUrl = document.getElementById('imageUrl').value;
         
         if (!message.trim() && !imageUrl) {
-            addLog("Pesan atau gambar harus diisi.", "error");
+            addLog("Message or image required.", "error");
             return;
         }
         
-        addLog(`Broadcast ke ${currentUsers.length} user...`, "info");
+        addLog(`Broadcasting to ${currentUsers.length} users...`, "info");
         let success = 0, failed = 0;
         
         for (let user of currentUsers) {
@@ -640,6 +778,15 @@
                     caption: message,
                     parse_mode: 'HTML'
                 });
+                // Fallback to document if photo fails
+                if (!result || !result.ok) {
+                    result = await callTelegram('sendDocument', bot.token, {
+                        chat_id: user.id,
+                        document: imageUrl,
+                        caption: message,
+                        parse_mode: 'HTML'
+                    });
+                }
             } else {
                 result = await callTelegram('sendMessage', bot.token, {
                     chat_id: user.id,
@@ -649,18 +796,19 @@
             }
             if (result && result.ok) success++;
             else failed++;
-            await new Promise(r => setTimeout(r, 50));
+            await new Promise(r => setTimeout(r, 60));
         }
         
-        addLog(`Broadcast selesai. Berhasil: ${success}, Gagal: ${failed}`, success > 0 ? "success" : "error");
+        addLog(`Broadcast complete. Success: ${success}, Failed: ${failed}`, success > 0 ? "success" : "error");
     }
 
+    // ======================= SCHEDULE FUNCTIONS =======================
     function addSchedule() {
         const scheduleTime = document.getElementById('scheduleTime').value;
         const message = document.getElementById('scheduleMessage').value;
         
         if (!scheduleTime || !message.trim()) {
-            addLog("Isi waktu dan pesan untuk jadwal.", "error");
+            addLog("Fill time and message for schedule.", "error");
             return;
         }
         
@@ -675,7 +823,7 @@
         
         schedules.push(schedule);
         localStorage.setItem('all_schedules', JSON.stringify(schedules));
-        addLog(`Jadwal ditambahkan: ${scheduleTime}`, "success");
+        addLog(`Schedule added: ${scheduleTime}`, "success");
         displaySchedules();
     }
     
@@ -684,7 +832,7 @@
         const activeSchedules = schedules.filter(s => !s.executed);
         
         if (activeSchedules.length === 0) {
-            container.innerHTML = '<div style="color: #8892b0; text-align: center;">Tidak ada jadwal aktif</div>';
+            container.innerHTML = '<div style="color: #8892b0; text-align: center;">No active schedules</div>';
             return;
         }
         
@@ -693,9 +841,9 @@
             html += `
                 <div class="schedule-item">
                     <strong>${s.botName}</strong><br>
-                    Waktu: ${s.time}<br>
-                    Pesan: ${s.message.substring(0, 50)}${s.message.length > 50 ? '...' : ''}<br>
-                    <button onclick="deleteSchedule(${s.id})" style="margin-top: 8px; padding: 4px 12px; width: auto;">Hapus</button>
+                    Time: ${s.time}<br>
+                    Message: ${s.message.substring(0, 50)}${s.message.length > 50 ? '...' : ''}<br>
+                    <button onclick="deleteSchedule(${s.id})" style="margin-top: 8px; padding: 4px 12px; width: auto;">Delete</button>
                 </div>
             `;
         });
@@ -706,7 +854,7 @@
         schedules = schedules.filter(s => s.id !== id);
         localStorage.setItem('all_schedules', JSON.stringify(schedules));
         displaySchedules();
-        addLog("Jadwal dihapus", "info");
+        addLog("Schedule deleted", "info");
     };
     
     function startScheduleChecker() {
@@ -724,7 +872,7 @@
                             const savedUsers = localStorage.getItem(`bot_users_${bot.name}`);
                             if (savedUsers) {
                                 const users = JSON.parse(savedUsers);
-                                addLog(`Menjalankan jadwal untuk ${schedule.botName} ke ${users.length} user`, "info");
+                                addLog(`Executing schedule for ${schedule.botName} to ${users.length} users`, "info");
                                 for (let user of users) {
                                     await callTelegram('sendMessage', bot.token, {
                                         chat_id: user.id,
@@ -733,7 +881,7 @@
                                     });
                                     await new Promise(r => setTimeout(r, 50));
                                 }
-                                addLog(`Jadwal ${schedule.id} selesai`, "success");
+                                addLog(`Schedule ${schedule.id} completed`, "success");
                             }
                         }
                         displaySchedules();
@@ -752,14 +900,14 @@
         logDiv.scrollTop = logDiv.scrollHeight;
     }
 
-    // Event Listeners
+    // ======================= EVENT LISTENERS =======================
     document.getElementById('saveTokenBtn').onclick = () => {
         const newToken = document.getElementById('manualToken').value.trim();
         if (newToken) {
             saveCurrentBotToken(newToken);
-            addLog("Token disimpan.", "success");
+            addLog("Token saved.", "success");
         } else {
-            addLog("Token tidak boleh kosong.", "error");
+            addLog("Token cannot be empty.", "error");
         }
     };
     
@@ -774,7 +922,7 @@
     };
     document.getElementById('clearDataBtn').onclick = () => {
         const botName = getCurrentBotName();
-        if (botName && confirm(`Reset semua data untuk ${botName}?`)) {
+        if (botName && confirm(`Reset all data for ${botName}?`)) {
             localStorage.removeItem(`bot_users_${botName}`);
             localStorage.removeItem(`bot_token_${botName}`);
             currentUsers = [];
@@ -783,19 +931,19 @@
             document.getElementById('manualToken').value = '';
             renderBotList();
             updateUserDisplay();
-            addLog(`Data bot ${botName} telah direset.`, "info");
+            addLog(`Bot data for ${botName} has been reset.`, "info");
         }
     };
     document.getElementById('executeSingleBtn').onclick = async () => {
         const userId = document.getElementById('targetUserId').value.trim();
         const msg = document.getElementById('singleMessage').value.trim();
         if (!userId || !msg) {
-            addLog("User ID dan pesan harus diisi.", "error");
+            addLog("User ID and message required.", "error");
             return;
         }
         const bot = BOTS.find(b => b.id === currentBotId);
         if (!bot || !bot.token) {
-            addLog("Token bot belum disimpan.", "error");
+            addLog("Bot token not saved.", "error");
             return;
         }
         const result = await callTelegram('sendMessage', bot.token, {
@@ -803,12 +951,17 @@
             text: msg,
             parse_mode: 'HTML'
         });
-        if (result && result.ok) addLog(`Pesan terkirim ke user ${userId}`, "success");
-        else addLog(`Gagal kirim ke ${userId}`, "error");
+        if (result && result.ok) addLog(`Message sent to user ${userId}`, "success");
+        else addLog(`Failed to send to ${userId}`, "error");
     };
+    
+    // Auto response event listeners
+    document.getElementById('saveAutoResponseBtn').onclick = saveAutoResponseSettings;
+    document.getElementById('testAutoResponseBtn').onclick = testAutoResponse;
     
     // Inisialisasi
     loadStorage();
 </script>
 </body>
 </html>
+       
