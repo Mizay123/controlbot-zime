@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ZIME BOT CONTROL - Scroll Mode</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            font-family: 'Segoe UI', 'Courier New', 'Monaco', monospace;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Single column container - SCROLL MODE */
+        .scroll-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(10, 10, 20, 0.6);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 25px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .header {
+            text-align: center;
+            padding-bottom: 25px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(100, 150, 255, 0.5);
+        }
+
+        .header p {
+            color: #8892b0;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        /* Card Style - Vertikal */
+        .card {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+        }
+
+        .card:hover {
+            border-color: rgba(100, 150, 255, 0.3);
+            box-shadow: 0 0 20px rgba(100, 150, 255, 0.1);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #e6f1ff;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            letter-spacing: 1px;
+        }
+
+        /* Bot Grid */
+        .bot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .bot-item {
+            background: rgba(20, 20, 40, 0.8);
+            padding: 14px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        .bot-item:hover {
+            background: rgba(60, 80, 120, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .bot-item.selected {
+            background: linear-gradient(135deg, #2c3e66, #1a2a44);
+            border: 1px solid #5a7d9a;
+            box-shadow: 0 0 12px rgba(90, 125, 154, 0.3);
+        }
+
+        .bot-name {
+            color: #ccd6f6;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .bot-status {
+            font-size: 11px;
+            color: #64ffda;
+            margin-top: 6px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #a8b2d1;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border-radius: 14px;
+            font-family: monospace;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #5a7d9a;
+            box-shadow: 0 0 10px rgba(90, 125, 154, 0.3);
+        }
+
+        button {
+            background: linear-gradient(135deg, #2c3e66, #1a2a44);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            font-family: inherit;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(135deg, #3a5080, #2a3a60);
+        }
+
+        button.secondary {
+            background: rgba(100, 100, 120, 0.4);
+        }
+
+        button.danger {
+            background: rgba(150, 60, 60, 0.6);
+        }
+
+        button.success {
+            background: rgba(60, 120, 80, 0.6);
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .flex-row button {
+            flex: 1;
+        }
+
+        .log-area {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 16px;
+            padding: 16px;
+            height: 250px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .user-list-area {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 16px;
+            padding: 12px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .user-item {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 12px;
+            color: #cbd5e1;
+            cursor: pointer;
+        }
+
+        .user-item:hover {
+            background: rgba(100, 150, 255, 0.2);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #64ffda;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #8892b0;
+        }
+
+        hr {
+            border-color: rgba(255, 255, 255, 0.05);
+            margin: 20px 0;
+        }
+
+        .schedule-item {
+            background: rgba(20, 20, 40, 0.6);
+            padding: 10px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            margin-top: 10px;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .single-user-panel {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            display: none;
+        }
+
+        /* Scroll indicator */
+        .scroll-hint {
+            text-align: center;
+            padding: 15px;
+            color: #5a7d9a;
+            font-size: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 10px;
+        }
+
+        .scroll-hint::before {
+            content: "Zime majesty";
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="scroll-container">
+    <div class="header">
+        <h1>ZIME BOT CONTROL</h1>
+        <p>Ultimate Bot Management | Broadcast | Schedule | Export</p>
+    </div>
+
+    <!-- CARD 1: BOT SELECTOR -->
+    <div class="card">
+        <div class="card-title">BOT SELECTOR</div>
+        <div class="bot-grid" id="botListContainer"></div>
+        
+        <div class="input-group" style="margin-top: 20px;">
+            <label>BOT TOKEN (Manual Input)</label>
+            <input type="password" id="manualToken" placeholder="Masukkan token bot dari @BotFather">
+            <button id="saveTokenBtn" style="margin-top: 10px;">Simpan Token untuk Bot Ini</button>
+        </div>
+    </div>
+
+    <!-- CARD 2: USER DATABASE -->
+    <div class="card">
+        <div class="card-title">USER DATABASE</div>
+        <div id="userStats" class="stats">
+            <div class="stat-box">
+                <div class="stat-number" id="totalUsers">0</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" id="lastSync">-</div>
+                <div class="stat-label">Last Sync</div>
+            </div>
+        </div>
+        <div class="flex-row">
+            <button id="syncUsersBtn">Sinkronisasi User</button>
+            <button id="exportCsvBtn" class="success">Export ke CSV</button>
+        </div>
+        <div id="userListArea" class="user-list-area" style="margin-top: 15px;">
+            <div style="color: #8892b0; text-align: center;">Belum ada data, klik sinkronisasi</div>
+        </div>
+    </div>
+
+    <!-- CARD 3: BROADCAST MESSAGE -->
+    <div class="card">
+        <div class="card-title">BROADCAST MESSAGE</div>
+        <div class="input-group">
+            <label>Pesan ke Semua User (Support HTML)</label>
+            <textarea id="broadcastMessage" rows="3" placeholder="Tulis pesan broadcast di sini..."></textarea>
+        </div>
+        <div class="input-group">
+            <label>Kirim Gambar (URL atau File)</label>
+            <input type="text" id="imageUrl" placeholder="https://example.com/image.jpg">
+            <input type="file" id="imageFile" accept="image/*" style="margin-top: 8px;">
+            <img id="imagePreview" class="image-preview" alt="Preview">
+        </div>
+        <button id="sendBroadcastBtn">Kirim ke Seluruh User</button>
+    </div>
+
+    <!-- CARD 4: SCHEDULED BROADCAST -->
+    <div class="card">
+        <div class="card-title">SCHEDULED BROADCAST</div>
+        <div class="input-group">
+            <label>Tanggal & Waktu</label>
+            <input type="datetime-local" id="scheduleTime">
+        </div>
+        <div class="input-group">
+            <label>Pesan Terjadwal</label>
+            <textarea id="scheduleMessage" rows="2" placeholder="Pesan untuk dikirim otomatis..."></textarea>
+        </div>
+        <div class="flex-row">
+            <button id="addScheduleBtn">Tambah Jadwal</button>
+            <button id="viewSchedulesBtn" class="secondary">Lihat Jadwal</button>
+        </div>
+        <div id="scheduleList" style="margin-top: 15px; max-height: 200px; overflow-y: auto;"></div>
+    </div>
+
+    <!-- CARD 5: SINGLE USER MESSAGE -->
+    <div class="card">
+        <div class="card-title">KIRIM KE USER TERTENTU</div>
+        <div id="singleUserPanel" class="single-user-panel">
+            <input type="text" id="targetUserId" placeholder="User ID" style="margin-bottom: 8px;">
+            <textarea id="singleMessage" rows="2" placeholder="Pesan spesifik..."></textarea>
+            <button id="executeSingleBtn" style="margin-top: 8px;">Kirim Sekarang</button>
+        </div>
+        <button id="showSinglePanelBtn" class="secondary">Tampilkan Panel User Spesifik</button>
+        <button id="clearDataBtn" class="danger" style="margin-top: 10px;">Reset Data Bot Ini</button>
+    </div>
+
+    <!-- CARD 6: ACTIVITY LOG -->
+    <div class="card">
+        <div class="card-title">ACTIVITY LOG</div>
+        <div id="logArea" class="log-area">
+            [System] ZIME Bot Control siap digunakan
+        </div>
+    </div>
+
+    <div class="scroll-hint"></div>
+</div>
+
+<script>
+    // ======================= DATA BOT (10 Username) =======================
+    const BOTS = [
+        { id: 1, name: "bot1", token: null },
+        { id: 2, name: "bot2", token: null },
+        { id: 3, name: "bot3", token: null },
+        { id: 4, name: "bot4", token: null },
+        { id: 5, name: "bot5", token: null },
+        { id: 6, name: "bot6", token: null },
+        { id: 7, name: "bot7", token: null },
+        { id: 8, name: "bot8", token: null },
+        { id: 9, name: "bot9", token: null },
+        { id: 10, name: "bot10", token: null }
+    ];
+
+    let currentBotId = null;
+    let currentUsers = [];
+    let schedules = [];
+
+    function loadStorage() {
+        for (let bot of BOTS) {
+            const savedToken = localStorage.getItem(`bot_token_${bot.name}`);
+            if (savedToken) bot.token = savedToken;
+            
+            if (bot.name === getCurrentBotName()) {
+                const savedUsers = localStorage.getItem(`bot_users_${bot.name}`);
+                if (savedUsers) currentUsers = JSON.parse(savedUsers);
+            }
+        }
+        
+        const lastBot = localStorage.getItem('current_bot_id');
+        if (lastBot) currentBotId = parseInt(lastBot);
+        else if (BOTS.length > 0) currentBotId = BOTS[0].id;
+        
+        const savedSchedules = localStorage.getItem('all_schedules');
+        if (savedSchedules) schedules = JSON.parse(savedSchedules);
+        
+        renderBotList();
+        updateUserDisplay();
+        startScheduleChecker();
+    }
+
+    function getCurrentBotName() {
+        const bot = BOTS.find(b => b.id === currentBotId);
+        return bot ? bot.name : null;
+    }
+
+    function saveCurrentBotToken(token) {
+        const bot = BOTS.find(b => b.id === currentBotId);
+        if (bot) {
+            bot.token = token;
+            localStorage.setItem(`bot_token_${bot.name}`, token);
+            addLog(`Token untuk ${bot.name} telah disimpan`, "info");
+        }
+    }
+
+    function saveUsersToStorage(users) {
+        const botName = getCurrentBotName();
+        if (botName) {
+            localStorage.setItem(`bot_users_${botName}`, JSON.stringify(users));
+            currentUsers = users;
+            updateUserDisplay();
+        }
+    }
+
+    function updateUserDisplay() {
+        const total = currentUsers.length;
+        document.getElementById('totalUsers').innerText = total;
+        const lastSyncTime = localStorage.getItem(`last_sync_${getCurrentBotName()}`) || '-';
+        document.getElementById('lastSync').innerText = lastSyncTime;
+        
+        const container = document.getElementById('userListArea');
+        if (total === 0) {
+            container.innerHTML = '<div style="color: #8892b0; text-align: center;">Belum ada data, klik sinkronisasi</div>';
+            return;
+        }
+        
+        let html = '';
+        currentUsers.forEach(user => {
+            html += `<div class="user-item" onclick="fillUserId('${user.id}')">ID: ${user.id} | ${user.name} | @${user.username}</div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    window.fillUserId = function(userId) {
+        document.getElementById('targetUserId').value = userId;
+        document.getElementById('singleUserPanel').style.display = 'block';
+        addLog(`User ID ${userId} siap dikirimi pesan`, "info");
+    };
+
+    function renderBotList() {
+        const container = document.getElementById('botListContainer');
+        container.innerHTML = '';
+        for (let bot of BOTS) {
+            const div = document.createElement('div');
+            div.className = `bot-item ${currentBotId === bot.id ? 'selected' : ''}`;
+            div.innerHTML = `
+                <div class="bot-name">${bot.name}</div>
+                <div class="bot-status">${bot.token ? 'Token tersimpan' : 'Token belum diisi'}</div>
+            `;
+            div.onclick = () => switchBot(bot.id);
+            container.appendChild(div);
+        }
+        
+        const currentBot = BOTS.find(b => b.id === currentBotId);
+        if (currentBot && currentBot.token) {
+            document.getElementById('manualToken').value = currentBot.token;
+        } else {
+            document.getElementById('manualToken').value = '';
+        }
+    }
+
+    function switchBot(botId) {
+        currentBotId = botId;
+        localStorage.setItem('current_bot_id', botId);
+        
+        const botName = getCurrentBotName();
+        const savedUsers = localStorage.getItem(`bot_users_${botName}`);
+        currentUsers = savedUsers ? JSON.parse(savedUsers) : [];
+        
+        const bot = BOTS.find(b => b.id === botId);
+        document.getElementById('manualToken').value = bot && bot.token ? bot.token : '';
+        
+        renderBotList();
+        updateUserDisplay();
+        addLog(`Beralih ke bot: ${botName}`, "info");
+    }
+
+    async function callTelegram(method, token, params = {}) {
+        const url = `https://api.telegram.org/bot${token}/${method}`;
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(params)
+            });
+            return await res.json();
+        } catch(e) {
+            addLog(`Network error: ${e.message}`, "error");
+            return null;
+        }
+    }
+
+    async function syncUsers() {
+        const bot = BOTS.find(b => b.id === currentBotId);
+        if (!bot || !bot.token) {
+            addLog(`Token untuk ${bot.name} belum diisi. Simpan token dulu.`, "error");
+            return;
+        }
+        
+        addLog(`Memulai sinkronisasi user untuk ${bot.name}...`, "info");
+        const result = await callTelegram('getUpdates', bot.token, { timeout: 1, allowed_updates: ['message'] });
+        
+        if (!result || !result.ok) {
+            addLog(`Gagal sync: ${result?.description || 'Token invalid'}`, "error");
+            return;
+        }
+        
+        const updates = result.result;
+        const userMap = new Map();
+        for (let update of updates) {
+            const msg = update.message;
+            if (msg && msg.from) {
+                const from = msg.from;
+                if (!userMap.has(from.id)) {
+                    userMap.set(from.id, {
+                        id: from.id,
+                        name: `${from.first_name || ''} ${from.last_name || ''}`.trim() || from.username || 'No Name',
+                        username: from.username || 'no_username'
+                    });
+                }
+            }
+        }
+        
+        const users = Array.from(userMap.values());
+        saveUsersToStorage(users);
+        const now = new Date().toLocaleString();
+        localStorage.setItem(`last_sync_${bot.name}`, now);
+        document.getElementById('lastSync').innerText = now;
+        addLog(`Sync selesai. Ditemukan ${users.length} user.`, "success");
+    }
+
+    function exportToCSV() {
+        if (currentUsers.length === 0) {
+            addLog("Tidak ada data user untuk diexport.", "error");
+            return;
+        }
+        
+        let csvContent = "User ID,Nama,Username\n";
+        currentUsers.forEach(user => {
+            csvContent += `${user.id},${user.name},${user.username}\n`;
+        });
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.setAttribute('download', `users_${getCurrentBotName()}_${Date.now()}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        addLog(`Export CSV berhasil: ${currentUsers.length} user`, "success");
+    }
+
+    document.getElementById('imageFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const imgUrl = event.target.result;
+                document.getElementById('imageUrl').value = imgUrl;
+                const preview = document.getElementById('imagePreview');
+                preview.src = imgUrl;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+   
